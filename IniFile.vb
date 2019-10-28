@@ -1,7 +1,4 @@
-﻿'-----------------------------------------------------------------------
-' https://github.com/glennsdev/IniFile
-'-----------------------------------------------------------------------
-Imports System.IO
+﻿Imports System.IO
 Imports System.Text
 
 Public Class IniFile
@@ -116,7 +113,6 @@ Public Class IniFile
         End Try
     End Function
 
-
     Default Public Property Items(ByVal Key As String) As String
         Get
             Dim nIndex As Int32
@@ -174,7 +170,6 @@ Public Class IniFile
             m_aText(nIndex) = Key & "=" & value
         End Set
     End Property
-
 
     Private Function _GetIndex(ByVal Key As String) As Int32
         Dim i As Integer
