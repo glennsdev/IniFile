@@ -2,8 +2,8 @@
 Imports System.Text
 
 Public Class IniFile
-    Dim m_aText() As String
-    Dim m_nArrayCount As Int32
+    Dim m_aItems() As String
+    Dim m_nItemsCount As Int32
 
     Dim m_sPathFileName As String = ""
 
@@ -17,7 +17,7 @@ Public Class IniFile
 
         Try
             If FileName = "" Then
-                Err.Raise(INIFILE_ERR_FILENAME_REQUIRED,, "Missing file name parameter")
+                Err.Raise(INIFILE_ERR_FILENAME_REQUIRED, , "Missing file name parameter")
             End If
 
             If InStr(FileName, "\") = 0 Then        '-- Only filename without path
@@ -27,19 +27,24 @@ Public Class IniFile
                 m_sPathFileName = FileName
             End If
 
-            fs = New FileStream(m_sPathFileName, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite)
-            sr = New StreamReader(fs, Encoding.UTF8)
+            '-- Initialize array items
+            m_nItemsCount = 0
 
-            m_nArrayCount = 0
+            If System.IO.File.Exists(m_sPathFileName) = False Then      '-- Not found
+                Return False
+            End If
+
+            fs = New FileStream(m_sPathFileName, FileMode.OpenOrCreate, FileAccess.Read, FileShare.Read)
+            sr = New StreamReader(fs, Encoding.UTF8)
 
             While True
                 sLine = sr.ReadLine()
 
-                m_nArrayCount = m_nArrayCount + 1
+                m_nItemsCount = m_nItemsCount + 1
 
-                ReDim Preserve m_aText(m_nArrayCount)
+                ReDim Preserve m_aItems(m_nItemsCount)
 
-                m_aText(m_nArrayCount - 1) = sLine
+                m_aItems(m_nItemsCount - 1) = sLine
 
                 If sr.EndOfStream Then
                     Exit While
@@ -85,14 +90,15 @@ Public Class IniFile
                 End If
             End If
 
+
             sWrite = ""
 
-            For i = 1 To m_nArrayCount
-                sWrite = sWrite & m_aText(i - 1) & vbCrLf
+            For i = 1 To m_nItemsCount
+                sWrite = sWrite & m_aItems(i - 1) & vbCrLf
             Next
 
 
-            fs = New FileStream(m_sPathFileName, FileMode.Create, FileAccess.Write)
+            fs = New FileStream(m_sPathFileName, FileMode.Create, FileAccess.Write, FileShare.None)
             sw = New StreamWriter(fs, Encoding.UTF8)
 
             sw.Write(sWrite)
@@ -134,7 +140,7 @@ Public Class IniFile
 
             '-- Found
 
-            sRetVal = m_aText(nIndex)
+            sRetVal = m_aItems(nIndex)
 
             nPos = InStr(sRetVal, "=")
 
@@ -160,14 +166,14 @@ Public Class IniFile
 
             If nIndex = -1 Then     '-- Not found
                 '-- Add new. Put key value at the bottom
-                m_nArrayCount = m_nArrayCount + 1
+                m_nItemsCount = m_nItemsCount + 1
 
-                ReDim Preserve m_aText(m_nArrayCount)
+                ReDim Preserve m_aItems(m_nItemsCount)
 
-                nIndex = m_nArrayCount - 1
+                nIndex = m_nItemsCount - 1
             End If
 
-            m_aText(nIndex) = Key & "=" & value
+            m_aItems(nIndex) = Key & "=" & value
         End Set
     End Property
 
@@ -178,11 +184,12 @@ Public Class IniFile
 
         sSearchKey = Key & "="   '-- "key="
 
-        For i = 1 To m_nArrayCount
-            nPos = InStr(m_aText(i - 1), sSearchKey, CompareMethod.Text)
+        For i = 1 To m_nItemsCount
+            nPos = InStr(LTrim(m_aItems(i - 1)), sSearchKey, CompareMethod.Text)
 
             If nPos = 1 Then
-                Return i - 1
+                '-- Return actual array index (zero based array)
+                Return (i - 1)
             End If
         Next
 
