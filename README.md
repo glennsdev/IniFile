@@ -5,7 +5,7 @@ Microsoft Visual Studio has provide a build-in application configuration file in
 
 Latest release (compiled DLL): https://github.com/glennsdev/IniFile/releases/latest
 
-## Ver 1.0
+## Ver 1.1
 
 - This DLL libary made with pure VB.NET
 - No dependency. NOT using kernel32.dll and no GetPrivateProfileStringA() calls
@@ -32,9 +32,21 @@ Load INI file:
 ```vb.net
 Dim oIniFile As New GLib.IniFile
 
-'-- If file not found it will be created automatically
+Dim lLoad As Boolean 
 
-Dim lLoad As Boolean = oIniFile.LoadFile("TEST.INI")
+'-- Load TEST.INI file on current EXE directory
+lLoad = oIniFile.LoadFile("TEST.INI")
+
+If (lLoad = False) Then
+  '-- File not found
+End If
+
+'-- Load TEST.INI file on "D:\myapp" directory
+lLoad = oIniFile.LoadFile("D:\myapp\SAMPLE.INI")
+
+If (lLoad = False) Then
+  '-- File not found
+End If
 ```
 
 Read two items value:
@@ -51,5 +63,19 @@ oIniFile("str2") = "DEF"
 
 Save INI file:
 ```vb.net
-Dim lSave As Boolean = oIniFile.SaveFile()
+Dim lSave As Boolean 
+
+'-- Save using same file name as defined whwn call LoadFile()
+lSave = oIniFile.SaveFile()
+
+If (lSave) Then
+  '-- Success
+End If
+
+'-- Save to some specific directory and file name
+lSave = oIniFile.SaveFile("D:\sample\SETTINGS.INI")
+
+If (lSave) Then
+  '-- Success
+End If
 ```
