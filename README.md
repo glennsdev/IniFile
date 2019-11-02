@@ -65,14 +65,14 @@ Save INI file:
 ```vb.net
 Dim lSave As Boolean 
 
-'-- Save using same file name as defined whwn call LoadFile()
+'-- Save using the file name passed on LoadFile()
 lSave = oIniFile.SaveFile()
 
 If (lSave) Then
   '-- Success
 End If
 
-'-- Save to some specific directory and file name
+'-- Save to specific directory and file name
 lSave = oIniFile.SaveFile("D:\sample\SETTINGS.INI")
 
 If (lSave) Then
