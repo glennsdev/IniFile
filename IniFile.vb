@@ -34,11 +34,11 @@ Public Class IniFile
                 Return False
             End If
 
-            fs = New FileStream(m_sPathFileName, FileMode.OpenOrCreate, FileAccess.Read, FileShare.Read)
+            fs = New FileStream(m_sPathFileName, FileMode.OpenOrCreate, FileAccess.Read, FileShare.ReadWrite)
             sr = New StreamReader(fs, Encoding.UTF8)
 
             While True
-                sLine = sr.ReadLine()
+                sLine = Trim(sr.ReadLine())
 
                 m_nItemsCount = m_nItemsCount + 1
 
@@ -98,7 +98,7 @@ Public Class IniFile
             Next
 
 
-            fs = New FileStream(m_sPathFileName, FileMode.Create, FileAccess.Write, FileShare.None)
+            fs = New FileStream(m_sPathFileName, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)
             sw = New StreamWriter(fs, Encoding.UTF8)
 
             sw.Write(sWrite)
@@ -145,9 +145,7 @@ Public Class IniFile
             nPos = InStr(sRetVal, "=")
 
             If (nPos > 0) Then
-                sRetVal = sRetVal.Substring(nPos)
-            Else
-
+                sRetVal = Trim(sRetVal.Substring(nPos))
             End If
 
             Return sRetVal
@@ -157,6 +155,7 @@ Public Class IniFile
             Dim nIndex As Integer
 
             Key = Trim(Key)
+            value = Trim(value)
 
             If Key = "" Then
                 Err.Raise(INIFILE_ERR_KEY_REQUIRED, , "Missing key parameter")
@@ -179,17 +178,29 @@ Public Class IniFile
 
     Private Function _GetIndex(ByVal Key As String) As Int32
         Dim i As Integer
-        Dim sSearchKey As String
+        Dim sItem As String
+        Dim sCheckKey As String
         Dim nPos As Int32
 
-        sSearchKey = Key & "="   '-- "key="
+
+        Key = LCase(Key)
 
         For i = 1 To m_nItemsCount
-            nPos = InStr(LTrim(m_aItems(i - 1)), sSearchKey, CompareMethod.Text)
+            sItem = m_aItems(i - 1)
 
-            If nPos = 1 Then
-                '-- Return actual array index (zero based array)
-                Return (i - 1)
+            If Left(sItem, 1) <> ";" Then       '-- Ignore remark char ";"
+                nPos = InStr(sItem, "=")        '-- Find "=" char
+
+                If nPos > 0 Then
+                    '-- Get Key
+                    sCheckKey = Trim(LCase(Left(m_aItems(i - 1), nPos - 1)))
+
+                    If sCheckKey = Key Then
+                        '-- Return actual array index (zero based array)
+                        Return (i - 1)
+                    End If
+                End If
+
             End If
         Next
 
