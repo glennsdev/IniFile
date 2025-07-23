@@ -1,7 +1,7 @@
 # IniFile
 Read Write INI File VB.NET
 
-Microsoft Visual Studio has provide a build-in application configuration file in XML format. Sometimes for more simple solution we might need just use the INI file.
+Microsoft Visual Studio provides a built-in application configuration file in XML format. However, for simpler use cases, an INI file might be a more straightforward solution.
 
 Download latest release (compiled DLL): https://github.com/glennsdev/IniFile/releases/download/1.2/IniFile.dll.zip
 
